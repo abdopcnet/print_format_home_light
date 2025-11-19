@@ -1,58 +1,39 @@
 <div style="margin:3px 0 0 0; border:1px solid #000; border-radius:8px; overflow:hidden; background:transparent; direction:rtl; font-family:'Arial',sans-serif; page-break-inside:avoid;">
-    <table style="width:100%; border-collapse:collapse; font-size:13px; margin:0; padding:0;">
-      <tbody>
-        <tr>
-          <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">الإجمالي غير شامل الضريبة</th>
-          <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
-            {{ doc.get_formatted("net_total") }}
-          </td>
-        </tr>
-        <tr>
-          <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">مجموع قيمة الضريبة</th>
-          <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
-            {{ doc.get_formatted("total_taxes_and_charges") }}
-          </td>
-        </tr>
-        <tr>
-          <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">الإجمالي شامل الضريبة</th>
-          <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
-            {{ doc.get_formatted("grand_total") }}
-          </td>
-        </tr>
-  
-        {% set payment_entries = frappe.get_all("Payment Entry", filters={"reference_name": doc.name}, fields=["name","paid_to","paid_amount"]) %}
-        {% if payment_entries %}
-          {% for entry in payment_entries %}
-          <tr>
-            <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">
-              المبلغ المحصل
-              <span style="display:inline-block; font-size:0.7em; font-weight:normal; color:#555; margin:0; margin-right:4px; white-space:nowrap;">(سداد: {{ entry.name }} - {{ entry.paid_to }})</span>
-            </th>
-            <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
-              {{ frappe.utils.fmt_money(entry.paid_amount, currency=doc.currency) }}
-            </td>
-          </tr>
-          {% endfor %}
-          <tr>
-            <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right; border-top:1px solid #bbb;">إجمالي المبالغ المحصلة</th>
-            <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; border-top:1px solid #bbb;">
-               {{ frappe.utils.fmt_money(payment_entries | map(attribute='paid_amount') | sum, currency=doc.currency) }}
-            </td>
-          </tr>
-        {% endif %}
-  
-        <tr>
-          <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:2px solid #000; font-weight:normal; text-align:right;">المبلغ المتبقي</th>
-          <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:2px solid #000; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
-            {{ doc.get_formatted("outstanding_amount") }}
-          </td>
-        </tr>
-  
-        <tr>
-          <td colspan="2" style="margin:0; padding:0 8px; font-size:0.7em; line-height:1; font-weight:normal; text-align:center; color:#222; border:none;">
-            {{ doc.custom_tafqeet_amount }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <table style="width:100%; border-collapse:collapse; font-size:13px; margin:0; padding:0;">
+    <tbody>
+      <tr>
+        <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">الإجمالي غير شامل الضريبة</th>
+        <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
+          {{ doc.get_formatted("net_total") }}
+        </td>
+      </tr>
+      <tr>
+        <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">مجموع قيمة الضريبة</th>
+        <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
+          {{ doc.get_formatted("total_taxes_and_charges") }}
+        </td>
+      </tr>
+      <tr>
+        <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">الإجمالي شامل الضريبة</th>
+        <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
+          {{ doc.get_formatted("grand_total") }}
+        </td>
+      </tr>
+      
+      {% if doc.advance_paid and doc.advance_paid > 0 %}
+      <tr>
+        <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">المدفوع مقدماً</th>
+        <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums;">
+          {{ doc.get_formatted("advance_paid") }}
+        </td>
+      </tr>
+      {% endif %}
+
+      <tr>
+        <td colspan="2" style="margin:0; padding:0 8px; border-top:2px solid #000; font-size:0.7em; line-height:1; font-weight:normal; text-align:center; color:#222;">
+          {{ doc.custom_tafqeet_amount }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
