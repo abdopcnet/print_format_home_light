@@ -1,45 +1,50 @@
-<div style="border:1.5pt solid #000; border-radius:8pt; background:#fff; width:100%; margin:0 0 2pt 0; padding:0; font-family:'Cairo',Tahoma,Arial,sans-serif; direction:rtl; box-sizing:border-box;">
-    <table style="width:100%; border-collapse:collapse; margin:0; padding:0; line-height:1.1; font-family:'Cairo',Tahoma,Arial,sans-serif;">
-      <tbody>
-        {% set customer_doc = frappe.get_doc("Customer", doc.customer) %}
-  
-        <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">اسم العميل</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">{{ doc.customer_name or "" }}</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">رقم الفاتورة</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">{{ doc.name }}</td>
-        </tr>
-        
-        {% set address_name = frappe.db.get_value("Dynamic Link", {"link_doctype": "Customer", "link_name": doc.customer}, "parent") %}
-        {% set address_line1 = "" %}{% set city = "" %}{% set pincode = "" %}
-        {% if address_name %}
-          {% set address_values = frappe.db.get_value("Address", address_name, ["address_line1","city","pincode"]) %}
-          {% if address_values %}
-            {% set address_line1 = address_values[0] %}{% set city = address_values[1] %}{% set pincode = address_values[2] %}
-          {% endif %}
+<div style="border:1.5pt solid #000;border-radius:8pt;background:#fff;width:100%;margin:0 0 2pt 0;padding:0;font-family:'Cairo',Tahoma,Arial,sans-serif;direction:rtl;box-sizing:border-box;">
+  <table style="width:100%;border-collapse:collapse;margin:0;padding:0;line-height:1.1;font-family:'Cairo',Tahoma,Arial,sans-serif;">
+    <tbody>
+      <tr style="font-size:10pt;line-height:1.1;white-space:nowrap;">
+        <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">اسم العميل</td>
+        <td style="border:none;padding:1pt;color:#111;text-align:right;">{{ doc.customer_name or "" }}</td>
+        <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">رقم الطلب</td>
+        <td style="border:none;padding:1pt;color:#111;text-align:right;">{{ doc.name }}</td>
+      </tr>
+      {% set address_name = frappe.db.get_value("Dynamic Link", {"link_doctype": "Customer", "link_name": doc.customer}, "parent") %}
+      {% set address_line1 = "" %}
+      {% set city = "" %}
+      {% set pincode = "" %}
+      {% if address_name %}
+        {% set address_values = frappe.db.get_value("Address", address_name, ["address_line1", "city", "pincode"]) %}
+        {% if address_values %}
+          {% set address_line1 = address_values[0] %}
+          {% set city = address_values[1] %}
+          {% set pincode = address_values[2] %}
         {% endif %}
-        <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">العنوان</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">{% if address_line1 or city or pincode %}{{ address_line1 or '' }}{% if city %}, {{ city }}{% endif %}{% if pincode %}, {{ pincode }}{% endif %}{% endif %}</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">تاريخ الفاتورة</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">
-            {% set days_ar = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'] %}
-            {% set dt = frappe.utils.get_datetime(doc.transaction_date ~ ' ' ~ doc.custom_time) %}
-            {% set weekday = dt.weekday() %}
-            {% set hour = dt.hour %}
-            {% set minute = dt.minute %}
-            {% set hour12 = hour if 1 <= hour <= 12 else (hour - 12 if hour > 12 else 12) %}
-            {% set am_pm_ar = 'ص' if hour < 12 else 'م' %}
-            {{ days_ar[weekday] }} {{ "%02d"|format(dt.day) }}-{{ "%02d"|format(dt.month) }}-{{ dt.year }} {{ hour12 }}:{{ "%02d"|format(minute) }} {{ am_pm_ar }}
-          </td>
-        </tr>
-  
-        {% if customer_doc.custom_vat_registration_number %}
-        <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">الرقم الضريبي</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">{{ customer_doc.custom_vat_registration_number }}</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">وقت الفاتورة</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">
+      {% endif %}
+      <tr style="font-size:10pt;line-height:1.1;white-space:nowrap;">
+        <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">العنوان</td>
+        <td style="border:none;padding:1pt;color:#111;text-align:right;">
+          {% if address_line1 or city or pincode %}
+            {{ address_line1 or '' }}{% if city %}, {{ city }}{% endif %}{% if pincode %}, {{ pincode }}{% endif %}
+          {% endif %}
+        </td>
+        <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">تاريخ الفاتورة</td>
+        <td style="border:none;padding:1pt;color:#111;text-align:right;">
+          {% set days_ar = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'] %}
+          {% set dt = frappe.utils.get_datetime(doc.transaction_date ~ ' ' ~ doc.custom_time) %}
+          {% set weekday = dt.weekday() %}
+          {% set hour = dt.hour %}
+          {% set minute = dt.minute %}
+          {% set hour12 = hour if 1 <= hour <= 12 else (hour - 12 if hour > 12 else 12) %}
+          {% set am_pm_ar = 'ص' if hour < 12 else 'م' %}
+          {{ days_ar[weekday] }} {{ "%02d"|format(dt.day) }}-{{ "%02d"|format(dt.month) }}-{{ dt.year }} {{ hour12 }}:{{ "%02d"|format(minute) }} {{ am_pm_ar }}
+        </td>
+      </tr>
+      {% set customer_doc = frappe.get_doc("Customer", doc.customer) %}
+      {% if customer_doc.custom_vat_registration_number %}
+        <tr style="font-size:10pt;line-height:1.1;white-space:nowrap;">
+          <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">الرقم الضريبي</td>
+          <td style="border:none;padding:1pt;color:#111;text-align:right;">{{ customer_doc.custom_vat_registration_number }}</td>
+          <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">وقت الفاتورة</td>
+          <td style="border:none;padding:1pt;color:#111;text-align:right;">
             {% set hour = dt.hour %}
             {% set minute = dt.minute %}
             {% set hour12 = hour if 1 <= hour <= 12 else (hour - 12 if hour > 12 else 12) %}
@@ -47,32 +52,31 @@
             {{ hour12 }}:{{ "%02d"|format(minute) }} {{ am_pm_ar }}
           </td>
         </tr>
-        {% endif %}
-        
-        {% set type_ar = {
-          "Tax Identification Number": ["الرقم الضريبي"],
-          "Commercial Registration Number": ["السجل التجاري"],
-          "MOMRAH License": ["رخصة وزارة الشؤون البلدية والقروية والإسكان"],
-          "MHRSD License": ["رخصة وزارة الموارد البشرية والتنمية الاجتماعية"],
-          "700 Number": ["الرقم الموحد"],
-          "MISA License": ["رخصة وزارة الاستثمار"],
-          "National ID": ["الهوية الوطنية"],
-          "GCC ID": ["هوية مجلس التعاون"],
-          "Iqama": ["رقم الإقامة"],
-          "Passport ID": ["رقم جواز السفر"],
-          "Other OD": ["أخرى"]
-        } %}
-        {% for row in customer_doc.custom_additional_ids %}
-          {% if row.value %}
-          <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-            <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">{{ type_ar.get(row.type_name, [row.type_name])[0] }}</td>
-            <td style="border:none; padding:1pt; color:#111; text-align:right;">{{ row.value }}</td>
+      {% endif %}
+      {% set type_ar = {
+        "Tax Identification Number":["الرقم الضريبي"],
+        "Commercial Registration Number":["السجل التجاري"],
+        "MOMRAH License":["رخصة وزارة الشؤون البلدية والقروية والإسكان"],
+        "MHRSD License":["رخصة وزارة الموارد البشرية والتنمية الاجتماعية"],
+        "700 Number":["الرقم الموحد"],
+        "MISA License":["رخصة وزارة الاستثمار"],
+        "National ID":["الهوية الوطنية"],
+        "GCC ID":["هوية مجلس التعاون"],
+        "Iqama":["رقم الإقامة"],
+        "Passport ID":["رقم جواز السفر"],
+        "Other OD":["أخرى"]
+      } %}
+      {% for row in customer_doc.custom_additional_ids %}
+        {% if row.value %}
+          <tr style="font-size:10pt;line-height:1.1;white-space:nowrap;">
+            <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">{{ type_ar.get(row.type_name, [row.type_name])[0] }}</td>
+            <td style="border:none;padding:1pt;color:#111;text-align:right;">{{ row.value }}</td>
             {% if loop.first %}
-              <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">نوع الفاتورة</td>
-              <td style="border:none; padding:1pt; color:#111; text-align:right;">{{ doc.invoice_type or "" }}</td>
+              <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">نوع الفاتورة</td>
+              <td style="border:none;padding:1pt;color:#111;text-align:right;">{{ doc.invoice_type or "" }}</td>
             {% elif loop.index == 2 %}
-              <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">تاريخ الاستحقاق</td>
-              <td style="border:none; padding:1pt; color:#111; text-align:right;">
+              <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">تاريخ الاستحقاق</td>
+              <td style="border:none;padding:1pt;color:#111;text-align:right;">
                 {% if doc.due_date %}
                   {% set due_dt = frappe.utils.get_datetime(doc.due_date) %}
                   {% set due_weekday = due_dt.weekday() %}
@@ -80,22 +84,24 @@
                 {% endif %}
               </td>
             {% else %}
-              <td style="border:none;"></td><td style="border:none;"></td>
+              <td style="border:none;"></td>
+              <td style="border:none;"></td>
             {% endif %}
           </tr>
-          {% endif %}
-        {% endfor %}
-  
-        {% if not customer_doc.custom_additional_ids or customer_doc.custom_additional_ids|length == 0 %}
-        <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-          <td style="border:none;"></td><td style="border:none;"></td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">نوع الفاتورة</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">{{ doc.invoice_type or "" }}</td>
+        {% endif %}
+      {% endfor %}
+      {% if customer_doc.custom_additional_ids|length == 0 %}
+        <tr style="font-size:10pt;line-height:1.1;white-space:nowrap;">
+          <td style="border:none;"></td>
+          <td style="border:none;"></td>
+          <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">نوع الفاتورة</td>
+          <td style="border:none;padding:1pt;color:#111;text-align:right;">{{ doc.invoice_type or "" }}</td>
         </tr>
-        <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-          <td style="border:none;"></td><td style="border:none;"></td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold;">تاريخ الاستحقاق</td>
-          <td style="border:none; padding:1pt; color:#111; text-align:right;">
+        <tr style="font-size:10pt;line-height:1.1;white-space:nowrap;">
+          <td style="border:none;"></td>
+          <td style="border:none;"></td>
+          <td style="border:none;padding:1pt;color:#111;font-weight:bold;text-align:right;">تاريخ الاستحقاق</td>
+          <td style="border:none;padding:1pt;color:#111;text-align:right;">
             {% if doc.due_date %}
               {% set due_dt = frappe.utils.get_datetime(doc.due_date) %}
               {% set due_weekday = due_dt.weekday() %}
@@ -103,7 +109,7 @@
             {% endif %}
           </td>
         </tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
