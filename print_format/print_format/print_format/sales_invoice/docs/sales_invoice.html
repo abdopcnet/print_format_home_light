@@ -132,7 +132,7 @@
   <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
     <thead>
       <tr style="border-bottom: 2px solid #666;">
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center;">م</th>
+        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; width: 30px;">م</th>
         <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 80px;">الكود</th>
         <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: right; border-left: 1px solid #ccc;">الصنف</th>
         <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 60px;">الوحدة</th>
@@ -144,7 +144,7 @@
     <tbody>
       {% for row in doc.items %}
         <tr style="{% if loop.index % 2 == 0 %}background: #f9f9f9;{% endif %}{% if not loop.last %}border-bottom: 1px dotted #aaa;{% endif %}">
-          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center;">{{ loop.index }}</td>
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 30px;">{{ loop.index }}</td>
           <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 80px;">{{ row.item_code }}</td>
           <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: right;">{{ row.description }}</td>
           <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 60px;">{{ row.uom }}</td>
@@ -189,9 +189,17 @@
             </td>
           </tr>
 
-          {% set payment_entries = frappe.get_all("Payment Entry", filters={"reference_name": doc.name}, fields=["name","paid_to","paid_amount"]) %}
-          {% if payment_entries %}
-            {% for entry in payment_entries %}
+          {% set payment_entries = frappe.get_all("Payment Entry Reference", filters={"reference_doctype": "Sales Invoice", "reference_name": doc.name}, fields=["parent", "allocated_amount"]) %}
+          {% set submitted_payments = [] %}
+          {% for ref in payment_entries %}
+            {% set pe_docstatus = frappe.db.get_value("Payment Entry", ref.parent, "docstatus") %}
+            {% if pe_docstatus == 1 %}
+              {% set pe_paid_to = frappe.db.get_value("Payment Entry", ref.parent, "paid_to") %}
+              {% set _ = submitted_payments.append({"name": ref.parent, "paid_to": pe_paid_to, "paid_amount": ref.allocated_amount}) %}
+            {% endif %}
+          {% endfor %}
+          {% if submitted_payments %}
+            {% for entry in submitted_payments %}
             <tr>
               <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right;">
                 المبلغ المحصل
@@ -205,7 +213,7 @@
             <tr>
               <th style="margin:0; padding:3px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; font-weight:normal; text-align:right; border-top:1px solid #bbb;">إجمالي المبالغ المحصلة</th>
               <td style="margin:0; padding:3px 5px; line-height:1; border-bottom:1px solid #ddd; text-align:left; font-weight:normal; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; border-top:1px solid #bbb;">
-                 {{ frappe.utils.fmt_money(payment_entries | map(attribute='paid_amount') | sum, currency=doc.currency) }}
+                 {{ frappe.utils.fmt_money(submitted_payments | map(attribute='paid_amount') | sum, currency=doc.currency) }}
               </td>
             </tr>
           {% endif %}
@@ -239,31 +247,26 @@
   </table>
 </div>
 
-<!-- Signatures -->
-<div style="position: fixed; bottom: 0; left: 0; width: 100%;">
-  <!-- بلوك التوقيع هنا -->
-  <div style="width:100%; max-width:100%; margin:0 auto 2px auto; overflow:hidden; background:#fff; font-family:'Cairo', Tahoma, Arial, sans-serif; line-height:1; border-radius:8px; z-index:999; page-break-inside:avoid; border:none; padding:0 0 7px 0;">
-    <div style="width:100%; padding:1px 1px 0 1px;">
-      <table style="width:100%; border:none; background:none; border-spacing:0; direction:rtl; line-height:1;">
-        <tbody>
-          <tr>
-            <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:1px; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none;">البائع</td>
-            <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:1px; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none;">المستلم</td>
-          </tr>
-          <tr>
-            <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:20px; padding:0;"></td>
-            <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:20px; padding:0;"></td>
-          </tr>
-          <tr>
-            <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
-              <div style="width:100px; margin:0 auto; border-top:2px dotted #000;"></div>
-            </td>
-            <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
-              <div style="width:100px; margin:0 auto; border-top:2px dotted #000;"></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<!-- Signatures - Moved to bottom, PDF compatible -->
+<div style="width:100%; margin-top:30px; margin-bottom:10px; overflow:hidden; background:#fff; font-family:'Cairo', Tahoma, Arial, sans-serif; line-height:1; border:none; padding:10px 0; page-break-inside:avoid;">
+  <table style="width:100%; border:none; background:none; border-spacing:0; direction:rtl; line-height:1; margin:0; padding:0;">
+    <tbody>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:5px; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; width:50%;">البائع</td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:5px; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; width:50%;">المستلم</td>
+      </tr>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:30px; padding:5px 5px 0 5px;"></td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:30px; padding:5px 5px 0 5px;"></td>
+      </tr>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0 5px; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
+          <div style="width:150px; margin:0 auto; border-top:2px dotted #000;"></div>
+        </td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0 5px; vertical-align:top; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
+          <div style="width:150px; margin:0 auto; border-top:2px dotted #000;"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
