@@ -1,5 +1,8 @@
 # Print Format
 
+![Version](https://img.shields.io/badge/version-20.11.2025-blue)
+
+
 ## Overview
 Print Format is an application designed to provide customizable and efficient print templates for various business needs. It allows users to define and manage print formats for invoices, receipts, and other documents.
 
