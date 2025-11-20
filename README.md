@@ -1,6 +1,6 @@
 # Print Format
 
-![Version](https://img.shields.io/badge/version-20.11.2025-blue)
+![Version](https://img.shields.io/badge/version-21.11.2025-blue)
 
 
 ## Overview
