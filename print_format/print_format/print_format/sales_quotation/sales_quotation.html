@@ -16,99 +16,154 @@
 
 <div style="width:100%;max-width:100%;margin:0 0 5px 0;padding:0;background:#fff;font-family:'Cairo',Tahoma,Arial,sans-serif;box-sizing:border-box;box-shadow:0 1px 3px rgba(255,182,49,0.09);direction:rtl;overflow:hidden;">
   <div style="display:flex;justify-content:center;align-items:center;padding:4px 10px;line-height:1;text-align:center;white-space:nowrap;font-weight:bold;color:#000;font-size:1.4em;letter-spacing:.5px;">
-    {% set customer_doc = frappe.get_doc("Customer", doc.party_name) %}
-    {% set has_vat = customer_doc.custom_vat_registration_number %}
-    {% set extra_ids = [] %}
-    {% for row in customer_doc.custom_additional_ids %}
-        {% if row.value %}
-            {% set _ = extra_ids.append(1) %}
+    {% if doc.quotation_to == "Customer" and doc.party_name %}
+      {% set customer_doc_header = None %}
+      {% set has_vat = None %}
+      {% set extra_ids = [] %}
+      {% if doc.party_name %}
+        {% set customer_doc_header = frappe.get_doc("Customer", doc.party_name) %}
+        {% if customer_doc_header %}
+          {% set has_vat = customer_doc_header.custom_vat_registration_number %}
+          {% for row in customer_doc_header.custom_additional_ids %}
+              {% if row.value %}
+                  {% set _ = extra_ids.append(1) %}
+              {% endif %}
+          {% endfor %}
         {% endif %}
-    {% endfor %}
-    {% if has_vat or extra_ids %}
-        عرض سعر - فاتورة ضريبية قياسية
+      {% endif %}
+      {% if has_vat or extra_ids %}
+          عرض سعر - فاتورة ضريبية قياسية
+      {% else %}
+          عرض سعر - فاتورة ضريبية مبسطة
+      {% endif %}
     {% else %}
-        عرض سعر - فاتورة ضريبية مبسطة
+        عرض سعر
     {% endif %}
   </div>
 </div>
 
 <!-- Customer Info -->
 <div style="border:1.5pt solid #000; border-radius:8pt; background:#fff; width:100%; margin:0 0 2pt 0; padding:0; font-family:'Cairo',Tahoma,Arial,sans-serif; direction:rtl; box-sizing:border-box;">
-  <table style="width:100%; border-collapse:collapse; margin:0; padding:0; line-height:1.1; font-family:'Cairo',Tahoma,Arial,sans-serif; table-layout:auto;">
+  <table style="width:100%; border-collapse:collapse; margin:0; padding:0; line-height:1.1; font-family:'Cairo',Tahoma,Arial,sans-serif; table-layout:fixed;">
     <tbody>
-      {% set customer_doc = frappe.get_doc("Customer", doc.party_name) %}
+      {% if doc.quotation_to == "Customer" and doc.party_name %}
+        {% set customer_doc = frappe.get_doc("Customer", doc.party_name) %}
+      {% else %}
+        {% set customer_doc = None %}
+      {% endif %}
 
-      {% if doc.customer_name or doc.name %}
       <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
         <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">اسم العميل</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.customer_name or "" }}</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.customer_name or doc.party_name or "" }}</td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">رقم عرض السعر</td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.name }}</td>
       </tr>
+      
+      {% if doc.quotation_to == "Customer" and doc.party_name %}
+        {% set address_name = frappe.db.get_value("Dynamic Link", {"link_doctype": "Customer", "link_name": doc.party_name}, "parent") %}
+      {% else %}
+        {% set address_name = None %}
       {% endif %}
-
-      {% set address_name = frappe.db.get_value("Dynamic Link", {"link_doctype": "Customer", "link_name": doc.party_name}, "parent") %}
-      {% set address_line2 = "" %}{% set custom_area = "" %}{% set address_line1 = "" %}{% set city = "" %}{% set pincode = "" %}
+      {% set address_line2 = "" %}{% set custom_area = "" %}{% set city = "" %}
       {% if address_name %}
-        {% set address_values = frappe.db.get_value("Address", address_name, ["address_line2","custom_area","address_line1","city","pincode"]) %}
+        {% set address_values = frappe.db.get_value("Address", address_name, ["address_line2","custom_area","city"]) %}
         {% if address_values %}
-          {% set address_line2 = address_values[0] %}{% set custom_area = address_values[1] %}{% set address_line1 = address_values[2] %}{% set city = address_values[3] %}{% set pincode = address_values[4] %}
+          {% set address_line2 = address_values[0] %}{% set custom_area = address_values[1] %}{% set city = address_values[2] %}
         {% endif %}
       {% endif %}
-      {% if address_line1 or city or pincode or doc.transaction_date %}
       <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
         <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">العنوان</td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
           {% set address_parts = [] %}
           {% if address_line2 %}{% set _ = address_parts.append(address_line2) %}{% endif %}
           {% if custom_area %}{% set _ = address_parts.append(custom_area) %}{% endif %}
-          {% if address_line1 %}{% set _ = address_parts.append(address_line1) %}{% endif %}
           {% if city %}{% set _ = address_parts.append(city) %}{% endif %}
           {{ address_parts | join(', ') }}
         </td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">تاريخ العرض</td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
-          {% if doc.transaction_date %}
-            {% set days_ar = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'] %}
-            {% set dt = frappe.utils.get_datetime(doc.transaction_date) %}
-            {% set weekday = dt.weekday() %}
-            {{ days_ar[weekday] }} {{ "%02d"|format(dt.day) }}-{{ "%02d"|format(dt.month) }}-{{ dt.year }}
+          {% set days_ar = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'] %}
+          {% set dt = frappe.utils.get_datetime(doc.transaction_date) %}
+          {% set weekday = dt.weekday() %}
+          {{ days_ar[weekday] }} {{ "%02d"|format(dt.day) }}-{{ "%02d"|format(dt.month) }}-{{ dt.year }}
+        </td>
+      </tr>
+
+      <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
+        {% if customer_doc and customer_doc.custom_vat_registration_number %}
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">الرقم الضريبي</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ customer_doc.custom_vat_registration_number }}</td>
+        {% else %}
+        <td style="border:none; width:15%; vertical-align:middle;"></td>
+        <td style="border:none; width:35%; vertical-align:middle;"></td>
+        {% endif %}
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">وقت العرض</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+          {% if doc.custom_time %}
+            {% set dt_time = frappe.utils.get_datetime(doc.transaction_date ~ ' ' ~ doc.custom_time) %}
+            {% set hour = dt_time.hour %}
+            {% set minute = dt_time.minute %}
+            {% set hour12 = hour if 1 <= hour <= 12 else (hour - 12 if hour > 12 else 12) %}
+            {% set am_pm_ar = 'ص' if hour < 12 else 'م' %}
+            {{ hour12 }}:{{ "%02d"|format(minute) }} {{ am_pm_ar }}
+          {% else %}
+            {% set dt_time = frappe.utils.get_datetime(doc.transaction_date) %}
+            {% set hour = dt_time.hour %}
+            {% set minute = dt_time.minute %}
+            {% set hour12 = hour if 1 <= hour <= 12 else (hour - 12 if hour > 12 else 12) %}
+            {% set am_pm_ar = 'ص' if hour < 12 else 'م' %}
+            {{ hour12 }}:{{ "%02d"|format(minute) }} {{ am_pm_ar }}
           {% endif %}
         </td>
       </tr>
+      
+      {% if customer_doc %}
+        {% set type_ar = {
+          "Tax Identification Number": ["الرقم الضريبي"],
+          "Commercial Registration Number": ["السجل التجاري"],
+          "MOMRAH License": ["رخصة وزارة الشؤون البلدية والقروية والإسكان"],
+          "MHRSD License": ["رخصة وزارة الموارد البشرية والتنمية الاجتماعية"],
+          "700 Number": ["الرقم الموحد"],
+          "MISA License": ["رخصة وزارة الاستثمار"],
+          "National ID": ["الهوية الوطنية"],
+          "GCC ID": ["هوية مجلس التعاون"],
+          "Iqama": ["رقم الإقامة"],
+          "Passport ID": ["رقم جواز السفر"],
+          "Other OD": ["أخرى"]
+        } %}
+        {% for row in customer_doc.custom_additional_ids %}
+          {% if row.value %}
+          <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
+            <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">{{ type_ar.get(row.type_name, [row.type_name])[0] }}</td>
+            <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ row.value }}</td>
+            {% if loop.index == 2 %}
+              <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">مدة صلاحية العرض</td>
+              <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+                {% if doc.valid_till %}
+                  {% set due_dt = frappe.utils.get_datetime(doc.valid_till) %}
+                  {% set due_weekday = due_dt.weekday() %}
+                  حتى {{ days_ar[due_weekday] }} {{ "%02d"|format(due_dt.day) }}-{{ "%02d"|format(due_dt.month) }}-{{ due_dt.year }}
+                {% endif %}
+              </td>
+            {% else %}
+              <td style="border:none; width:15%; vertical-align:middle;"></td><td style="border:none; width:35%; vertical-align:middle;"></td>
+            {% endif %}
+          </tr>
+          {% endif %}
+        {% endfor %}
       {% endif %}
 
-      {% if customer_doc.custom_vat_registration_number or doc.valid_till %}
+      {% if not customer_doc or (customer_doc and (not customer_doc.custom_additional_ids or customer_doc.custom_additional_ids|length == 0)) %}
       <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">الرقم الضريبي</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ customer_doc.custom_vat_registration_number or "" }}</td>
+        <td style="border:none; width:15%; vertical-align:middle;"></td><td style="border:none; width:35%; vertical-align:middle;"></td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">مدة صلاحية العرض</td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
           {% if doc.valid_till %}
-            {% set days_ar = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'] %}
-            {% set valid_dt = frappe.utils.get_datetime(doc.valid_till) %}
-            {% set valid_weekday = valid_dt.weekday() %}
-            حتى {{ days_ar[valid_weekday] }} {{ "%02d"|format(valid_dt.day) }}-{{ "%02d"|format(valid_dt.month) }}-{{ valid_dt.year }}
+            {% set due_dt = frappe.utils.get_datetime(doc.valid_till) %}
+            {% set due_weekday = due_dt.weekday() %}
+            حتى {{ days_ar[due_weekday] }} {{ "%02d"|format(due_dt.day) }}-{{ "%02d"|format(due_dt.month) }}-{{ due_dt.year }}
           {% endif %}
         </td>
-      </tr>
-      {% endif %}
-
-      {% if customer_doc.custom_cr_number or doc.contact_email %}
-      <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">السجل التجاري</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ customer_doc.custom_cr_number or "" }}</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">البريد الإلكتروني</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.contact_email or "" }}</td>
-      </tr>
-      {% endif %}
-
-      {% if customer_doc.custom_700_number or doc.contact_mobile %}
-      <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">الرقم الموحد</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ customer_doc.custom_700_number or "" }}</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">رقم الجوال</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.contact_mobile or "" }}</td>
       </tr>
       {% endif %}
     </tbody>
@@ -162,35 +217,47 @@
   </table>
 </div>
 
-<!-- Totals -->
-<div style="width:300px; margin:3px 0 0 0; border:1px solid #000; border-radius:8px; overflow:hidden; background:transparent; direction:rtl; font-family:'Arial',sans-serif; page-break-inside:avoid; unicode-bidi: embed; display: block; margin-top: 10px; margin-bottom: 10px;">
-  <table style="width:100%; border-collapse:collapse; font-size:15px; margin:0; padding:0; line-height:1;">
-    <tbody>
-      <tr>
-        <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي غير شامل الضريبة</th>
-        <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-          {{ frappe.utils.fmt_money(doc.net_total, currency=doc.currency) | safe }}
-        </td>
-      </tr>
-      <tr>
-        <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">مجموع قيمة الضريبة</th>
-        <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-          {{ frappe.utils.fmt_money(doc.total_taxes_and_charges, currency=doc.currency) | safe }}
-        </td>
-      </tr>
-      <tr>
-        <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي شامل الضريبة</th>
-        <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-          {{ frappe.utils.fmt_money(doc.grand_total, currency=doc.currency) | safe }}
-        </td>
-      </tr>
+<!-- Totals - Fixed LTR Layout -->
+<div dir="ltr" style="direction: ltr; unicode-bidi: embed; width: 100%; margin-top: 10px; margin-bottom: 10px;">
+  <table style="width:100%; border-collapse:collapse; direction: ltr;">
+    <tr>
+      <!-- Totals Column - Left Half -->
+      <td style="width:50%; vertical-align:middle; padding-right:10px; direction: rtl; text-align: right;">
+        <div style="margin:3px 0 0 0; border:1px solid #000; border-radius:8px; overflow:hidden; background:transparent; direction:rtl; font-family:'Arial',sans-serif; page-break-inside:avoid; unicode-bidi: embed; display: block;">
+      <table style="width:100%; border-collapse:collapse; font-size:15px; margin:0; padding:0; line-height:1;">
+        <tbody>
+          <tr>
+            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي غير شامل الضريبة</th>
+            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
+              {{ frappe.utils.fmt_money(doc.net_total, currency=doc.currency) | safe }}
+            </td>
+          </tr>
+          <tr>
+            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">مجموع قيمة الضريبة</th>
+            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
+              {{ frappe.utils.fmt_money(doc.total_taxes_and_charges, currency=doc.currency) | safe }}
+            </td>
+          </tr>
+          <tr>
+            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي شامل الضريبة</th>
+            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
+              {{ frappe.utils.fmt_money(doc.grand_total, currency=doc.currency) | safe }}
+            </td>
+          </tr>
 
-      <tr>
-        <td colspan="2" style="margin:0; padding:7px 5px; font-size:16px; line-height:1.4; font-weight:bold; text-align:center; color:#222; border:none; word-wrap:break-word; white-space:normal; overflow-wrap:break-word;">
-          {{ doc.custom_tafqeet_amount }}
-        </td>
-      </tr>
-    </tbody>
+          <tr>
+            <td colspan="2" style="margin:0; padding:7px 5px; font-size:16px; line-height:1.4; font-weight:bold; text-align:center; color:#222; border:none; word-wrap:break-word; white-space:normal; overflow-wrap:break-word;">
+              {{ doc.custom_tafqeet_amount }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+      </td>
+      <!-- Empty Column - Right Half -->
+      <td style="width:50%; vertical-align:middle; padding-left:10px; direction: ltr; text-align: left;">
+      </td>
+    </tr>
   </table>
 </div>
 
@@ -220,10 +287,12 @@
           {% if doc.status %}
             {% set status_translation = {
               "Draft": "مسودة",
+              "Open": "مفتوح",
               "Submitted": "تم الإرسال",
               "Ordered": "تم الطلب",
               "Lost": "مفقود",
-              "Cancelled": "ملغي"
+              "Cancelled": "ملغي",
+              "Expired": "منتهي الصلاحية"
             } %}
             {% set translated_status = status_translation.get(doc.status, doc.status) %}
             <div style="margin-bottom: 10px;">
@@ -231,7 +300,7 @@
               <span style="font-size: 15px; font-weight: bold; padding: 5px 22px; border-radius: 7px; font-family: Arial, sans-serif; display: inline-block; line-height: 1.2; text-align: center; background:#e6f7ea; color:#0A9928; border:1.2px solid #0A9928;">
                 {{ translated_status }}
               </span>
-              {% elif doc.status == "Submitted" %}
+              {% elif doc.status == "Open" or doc.status == "Submitted" %}
               <span style="font-size: 15px; font-weight: bold; padding: 5px 22px; border-radius: 7px; font-family: Arial, sans-serif; display: inline-block; line-height: 1.2; text-align: center; background:#eaf1fb; color:#007BFF; border:1.2px solid #007BFF;">
                 {{ translated_status }}
               </span>
@@ -239,7 +308,7 @@
               <span style="font-size: 15px; font-weight: bold; padding: 5px 22px; border-radius: 7px; font-family: Arial, sans-serif; display: inline-block; line-height: 1.2; text-align: center; background:#fdeaea; color:#D23; border:1.2px solid #D23;">
                 {{ translated_status }}
               </span>
-              {% elif doc.status == "Cancelled" %}
+              {% elif doc.status == "Cancelled" or doc.status == "Expired" %}
               <span style="font-size: 15px; font-weight: bold; padding: 5px 22px; border-radius: 7px; font-family: Arial, sans-serif; display: inline-block; line-height: 1.2; text-align: center; background:#f5f5f5; color:#6C757D; border:1.2px solid #6C757D;">
                 {{ translated_status }}
               </span>
