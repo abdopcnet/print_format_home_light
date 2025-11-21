@@ -192,66 +192,44 @@
   </table>
 </div>
 
-<!-- Totals and QR Code (Two Columns) - Fixed LTR Layout -->
-<div dir="ltr" style="direction: ltr; unicode-bidi: embed; width: 100%; margin-top: 10px; margin-bottom: 10px;">
-  <table style="width:100%; border-collapse:collapse; direction: ltr;">
-    <tr>
-      <!-- Totals Column - Always Left -->
-      <td style="width:300px; vertical-align:middle; padding-right:10px; direction: rtl; text-align: right;">
-        <div style="margin:3px 0 0 0; border:1px solid #000; border-radius:8px; overflow:hidden; background:transparent; direction:rtl; font-family:'Arial',sans-serif; page-break-inside:avoid; unicode-bidi: embed; display: block;">
-      <table style="width:100%; border-collapse:collapse; font-size:15px; margin:0; padding:0; line-height:1;">
-        <tbody>
-          <tr>
-            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي غير شامل الضريبة</th>
-            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-              {{ frappe.utils.fmt_money(doc.net_total, currency=doc.currency) | safe }}
-            </td>
-          </tr>
-          <tr>
-            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">مجموع قيمة الضريبة</th>
-            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-              {{ frappe.utils.fmt_money(doc.total_taxes_and_charges, currency=doc.currency) | safe }}
-            </td>
-          </tr>
-          <tr>
-            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي شامل الضريبة</th>
-            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-              {{ frappe.utils.fmt_money(doc.grand_total, currency=doc.currency) | safe }}
-            </td>
-          </tr>
+<!-- Totals -->
+<div style="width:300px; margin:3px 0 0 0; border:1px solid #000; border-radius:8px; overflow:hidden; background:transparent; direction:rtl; font-family:'Arial',sans-serif; page-break-inside:avoid; unicode-bidi: embed; display: block; margin-top: 10px; margin-bottom: 10px;">
+  <table style="width:100%; border-collapse:collapse; font-size:15px; margin:0; padding:0; line-height:1;">
+    <tbody>
+      <tr>
+        <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي غير شامل الضريبة</th>
+        <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
+          {{ frappe.utils.fmt_money(doc.net_total, currency=doc.currency) | safe }}
+        </td>
+      </tr>
+      <tr>
+        <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">مجموع قيمة الضريبة</th>
+        <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
+          {{ frappe.utils.fmt_money(doc.total_taxes_and_charges, currency=doc.currency) | safe }}
+        </td>
+      </tr>
+      <tr>
+        <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">الإجمالي شامل الضريبة</th>
+        <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
+          {{ frappe.utils.fmt_money(doc.grand_total, currency=doc.currency) | safe }}
+        </td>
+      </tr>
 
-          {% if doc.advance_paid and doc.advance_paid > 0 %}
-          <tr>
-            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">المدفوع مقدماً</th>
-            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-              {{ frappe.utils.fmt_money(doc.advance_paid, currency=doc.currency) | safe }}
-            </td>
-          </tr>
-          {% endif %}
+      {% if doc.advance_paid and doc.advance_paid > 0 %}
+      <tr>
+        <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">المدفوع مقدماً</th>
+        <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
+          {{ frappe.utils.fmt_money(doc.advance_paid, currency=doc.currency) | safe }}
+        </td>
+      </tr>
+      {% endif %}
 
-          <tr>
-            <td colspan="2" style="margin:0; padding:7px 5px; font-size:16px; line-height:1.4; font-weight:bold; text-align:center; color:#222; border:none; word-wrap:break-word; white-space:normal; overflow-wrap:break-word;">
-              {{ doc.custom_tafqeet_amount }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-      </td>
-      
-      <!-- QR Code Column - Always Right -->
-      <td style="width:200px; vertical-align:middle; padding-left:10px; direction: ltr; text-align: right;">
-        <div style="margin: 2px 0 60px 0; text-align: right; direction: ltr; unicode-bidi: embed; display: block;">
-          {% if doc.custom_qr_image_src %}
-            <img src="{{ doc.custom_qr_image_src | safe }}" alt="QR Code" style="width: 180px; height: 180px; object-fit: contain; display: block; margin-left: auto;">
-          {% else %}
-            <div style="width: 180px; height: 180px; border: 2px solid #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-left: auto; background-color: #f9f9f9; direction: rtl; text-align: center; padding: 10px; box-sizing: border-box;">
-              <span style="font-family: 'Cairo', Arial, sans-serif; font-size: 14px; color: #666; font-weight: bold; line-height: 1.4;">لم يتم إنشاء الرمز</span>
-            </div>
-          {% endif %}
-        </div>
-      </td>
-    </tr>
+      <tr>
+        <td colspan="2" style="margin:0; padding:7px 5px; font-size:16px; line-height:1.4; font-weight:bold; text-align:center; color:#222; border:none; word-wrap:break-word; white-space:normal; overflow-wrap:break-word;">
+          {{ doc.custom_tafqeet_amount }}
+        </td>
+      </tr>
+    </tbody>
   </table>
 </div>
 
