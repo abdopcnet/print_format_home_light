@@ -174,14 +174,19 @@
     </thead>
     <tbody>
       {% for row in doc.references %}
-        {% set row_style = "" %}
         {% if loop.index % 2 == 0 %}
-          {% set row_style = row_style + "background: #f9f9f9; " %}
+          {% if not loop.last %}
+        <tr style="background: #f9f9f9; border-bottom: 1px dotted #aaa;">
+          {% else %}
+        <tr style="background: #f9f9f9;">
+          {% endif %}
+        {% else %}
+          {% if not loop.last %}
+        <tr style="border-bottom: 1px dotted #aaa;">
+          {% else %}
+        <tr>
+          {% endif %}
         {% endif %}
-        {% if not loop.last %}
-          {% set row_style = row_style + "border-bottom: 1px dotted #aaa; " %}
-        {% endif %}
-        <tr{% if row_style %} style="{{ row_style|trim }}"{% endif %}>
           <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 30px;">{{ loop.index }}</td>
           <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 120px;">{{ row.reference_doctype }}</td>
           <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 120px;">{{ row.reference_name }}</td>
