@@ -192,12 +192,12 @@
   </table>
 </div>
 
-<!-- Totals - Fixed LTR Layout -->
+<!-- Totals and QR Code (Two Columns) - Fixed LTR Layout -->
 <div dir="ltr" style="direction: ltr; unicode-bidi: embed; width: 100%; margin-top: 10px; margin-bottom: 10px;">
   <table style="width:100%; border-collapse:collapse; direction: ltr;">
     <tr>
-      <!-- Totals Column - Left Half -->
-      <td style="width:50%; vertical-align:middle; padding-right:10px; direction: rtl; text-align: right;">
+      <!-- Totals Column - Always Left -->
+      <td style="width:300px; vertical-align:middle; padding-right:10px; direction: rtl; text-align: right;">
         <div style="margin:3px 0 0 0; border:1px solid #000; border-radius:8px; overflow:hidden; background:transparent; direction:rtl; font-family:'Arial',sans-serif; page-break-inside:avoid; unicode-bidi: embed; display: block;">
       <table style="width:100%; border-collapse:collapse; font-size:15px; margin:0; padding:0; line-height:1;">
         <tbody>
@@ -230,7 +230,7 @@
           {% endif %}
 
           <tr>
-            <td colspan="2" style="margin:0; padding:7px 5px; font-size:16px; line-height:1.4; font-weight:bold; text-align:center; color:#222; border:none; word-wrap:break-word; white-space:normal; overflow-wrap:break-word;">
+            <td colspan="2" style="margin:0; padding:7px 5px; font-size:14px; line-height:1.4; font-weight:bold; text-align:center; color:#222; border:none; word-wrap:break-word; white-space:normal; overflow-wrap:break-word;">
               {{ doc.custom_tafqeet_amount }}
             </td>
           </tr>
@@ -238,8 +238,11 @@
       </table>
     </div>
       </td>
-      <!-- Empty Column - Right Half -->
-      <td style="width:50%; vertical-align:middle; padding-left:10px; direction: ltr; text-align: left;">
+      
+      <!-- Empty QR Code Column - Always Right (for layout consistency) -->
+      <td style="width:200px; vertical-align:middle; padding-left:10px; direction: ltr; text-align: right;">
+        <div style="margin: 2px 0 60px 0; text-align: right; direction: ltr; unicode-bidi: embed; display: block;">
+        </div>
       </td>
     </tr>
   </table>
