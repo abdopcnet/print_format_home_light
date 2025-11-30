@@ -55,8 +55,8 @@
       <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
         <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">اسم العميل</td>
         <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.customer_name or doc.party_name or "" }}</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">رقم عرض السعر</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.name }}</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:18%; white-space:nowrap; vertical-align:middle;">رقم عرض السعر</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:32%; white-space:nowrap; vertical-align:middle;">{{ doc.name }}</td>
       </tr>
       
       {% if doc.quotation_to == "Customer" and doc.party_name %}
@@ -80,8 +80,8 @@
           {% if city %}{% set _ = address_parts.append(city) %}{% endif %}
           {{ address_parts | join(', ') }}
         </td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">تاريخ العرض</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:18%; white-space:nowrap; vertical-align:middle;">تاريخ العرض</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:32%; white-space:nowrap; vertical-align:middle;">
           {% set days_ar = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'] %}
           {% set dt = frappe.utils.get_datetime(doc.transaction_date) %}
           {% set weekday = dt.weekday() %}
@@ -97,8 +97,8 @@
         <td style="border:none; width:15%; vertical-align:middle;"></td>
         <td style="border:none; width:35%; vertical-align:middle;"></td>
         {% endif %}
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">وقت العرض</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:18%; white-space:nowrap; vertical-align:middle;">وقت العرض</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:32%; white-space:nowrap; vertical-align:middle;">
           {% if doc.custom_time %}
             {% set dt_time = frappe.utils.get_datetime(doc.transaction_date ~ ' ' ~ doc.custom_time) %}
             {% set hour = dt_time.hour %}
@@ -137,16 +137,16 @@
             <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">{{ type_ar.get(row.type_name, [row.type_name])[0] }}</td>
             <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ row.value }}</td>
             {% if loop.index == 2 %}
-              <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">مدة صلاحية العرض</td>
-              <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+              <td style="border:none; padding:1pt 3pt 1pt 1pt; color:#111; text-align:right; font-weight:bold; width:18%; white-space:nowrap; vertical-align:middle;">مدة صلاحية العرض</td>
+              <td style="border:none; padding:1pt 3pt; color:#111; text-align:right; width:32%; vertical-align:middle;">
                 {% if doc.valid_till %}
                   {% set due_dt = frappe.utils.get_datetime(doc.valid_till) %}
                   {% set due_weekday = due_dt.weekday() %}
-                  حتى {{ days_ar[due_weekday] }} {{ "%02d"|format(due_dt.day) }}-{{ "%02d"|format(due_dt.month) }}-{{ due_dt.year }}
+                  &nbsp;حتى {{ days_ar[due_weekday] }} {{ "%02d"|format(due_dt.day) }}-{{ "%02d"|format(due_dt.month) }}-{{ due_dt.year }}
                 {% endif %}
               </td>
             {% else %}
-              <td style="border:none; width:15%; vertical-align:middle;"></td><td style="border:none; width:35%; vertical-align:middle;"></td>
+              <td style="border:none; width:18%; vertical-align:middle;"></td><td style="border:none; width:32%; vertical-align:middle;"></td>
             {% endif %}
           </tr>
           {% endif %}
@@ -155,13 +155,13 @@
 
       {% if not customer_doc or (customer_doc and (not customer_doc.custom_additional_ids or customer_doc.custom_additional_ids|length == 0)) %}
       <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
-        <td style="border:none; width:15%; vertical-align:middle;"></td><td style="border:none; width:35%; vertical-align:middle;"></td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">مدة صلاحية العرض</td>
-        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+        <td style="border:none; width:18%; vertical-align:middle;"></td><td style="border:none; width:32%; vertical-align:middle;"></td>
+        <td style="border:none; padding:1pt 3pt 1pt 1pt; color:#111; text-align:right; font-weight:bold; width:18%; white-space:nowrap; vertical-align:middle;">مدة صلاحية العرض</td>
+        <td style="border:none; padding:1pt 3pt; color:#111; text-align:right; width:32%; vertical-align:middle;">
           {% if doc.valid_till %}
             {% set due_dt = frappe.utils.get_datetime(doc.valid_till) %}
             {% set due_weekday = due_dt.weekday() %}
-            حتى {{ days_ar[due_weekday] }} {{ "%02d"|format(due_dt.day) }}-{{ "%02d"|format(due_dt.month) }}-{{ due_dt.year }}
+            &nbsp;حتى {{ days_ar[due_weekday] }} {{ "%02d"|format(due_dt.day) }}-{{ "%02d"|format(due_dt.month) }}-{{ due_dt.year }}
           {% endif %}
         </td>
       </tr>
