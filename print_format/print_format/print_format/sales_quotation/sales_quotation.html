@@ -16,29 +16,7 @@
 
 <div style="width:100%;max-width:100%;margin:0 0 5px 0;padding:0;background:#fff;font-family:'Cairo',Tahoma,Arial,sans-serif;box-sizing:border-box;box-shadow:0 1px 3px rgba(255,182,49,0.09);direction:rtl;overflow:hidden;">
   <div style="display:flex;justify-content:center;align-items:center;padding:4px 10px;line-height:1;text-align:center;white-space:nowrap;font-weight:bold;color:#000;font-size:1.4em;letter-spacing:.5px;">
-    {% if doc.quotation_to == "Customer" and doc.party_name %}
-      {% set customer_doc_header = None %}
-      {% set has_vat = None %}
-      {% set extra_ids = [] %}
-      {% if doc.party_name %}
-        {% set customer_doc_header = frappe.get_doc("Customer", doc.party_name) %}
-        {% if customer_doc_header %}
-          {% set has_vat = customer_doc_header.custom_vat_registration_number %}
-          {% for row in customer_doc_header.custom_additional_ids %}
-              {% if row.value %}
-                  {% set _ = extra_ids.append(1) %}
-              {% endif %}
-          {% endfor %}
-        {% endif %}
-      {% endif %}
-      {% if has_vat or extra_ids %}
-          عرض سعر - فاتورة ضريبية قياسية
-      {% else %}
-          عرض سعر - فاتورة ضريبية مبسطة
-      {% endif %}
-    {% else %}
-        عرض سعر
-    {% endif %}
+    عرض سعر
   </div>
 </div>
 
