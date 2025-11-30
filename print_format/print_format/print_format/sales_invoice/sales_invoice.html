@@ -16,14 +16,15 @@
 
 <div style="width:100%;max-width:100%;margin:0 0 5px 0;padding:0;background:#fff;font-family:'Cairo',Tahoma,Arial,sans-serif;box-sizing:border-box;box-shadow:0 1px 3px rgba(255,182,49,0.09);direction:rtl;overflow:hidden;">
   <div style="display:flex;justify-content:center;align-items:center;padding:4px 10px;line-height:1;text-align:center;white-space:nowrap;font-weight:bold;color:#000;font-size:1.4em;letter-spacing:.5px;">
-    {% set invoice_type = "Simplified" %}
-    {% if doc.custom_zatca_siaf %}
-        {% set buyer_vat = frappe.db.get_value("Sales Invoice Additional Fields", doc.custom_zatca_siaf, "buyer_vat_registration_number") %}
-        {% if buyer_vat %}
-            {% set invoice_type = "Standard" %}
+    {% set customer_doc = frappe.get_doc("Customer", doc.customer) %}
+    {% set has_vat = customer_doc.custom_vat_registration_number %}
+    {% set extra_ids = [] %}
+    {% for row in customer_doc.custom_additional_ids %}
+        {% if row.value %}
+            {% set _ = extra_ids.append(1) %}
         {% endif %}
-    {% endif %}
-    {% if invoice_type == "Standard" %}
+    {% endfor %}
+    {% if has_vat or extra_ids %}
         {% if doc.is_return %}إشعار دائن ضريبي قياسي{% elif doc.is_debit_note %}إشعار مدين ضريبي قياسي{% else %}فاتورة ضريبية قياسية{% endif %}
     {% else %}
         {% if doc.is_return %}إشعار دائن ضريبي مبسط{% elif doc.is_debit_note %}إشعار مدين ضريبي مبسط{% else %}فاتورة ضريبية مبسطة{% endif %}
