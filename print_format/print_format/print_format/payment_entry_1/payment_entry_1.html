@@ -1,0 +1,170 @@
+<!-- PDF Margins - Meta Tags for wkhtmltopdf -->
+<meta name="margin-top" content="5mm">
+<meta name="margin-bottom" content="5mm">
+<meta name="margin-left" content="5mm">
+<meta name="margin-right" content="5mm">
+
+<!-- Letterhead -->
+<div style="height:5px;"></div>
+<div style="width:100%; text-align:center; margin:0 0 3px 0;">
+  <img src="/files/company.png" alt="Letterhead" style="max-width:100%; height:auto; display:block; margin:0 auto;">
+</div>
+
+<!-- هيدر إيصال مدفوعات بعنوان متغير حسب نوع الإيصال مع رقم المستند وتباعد علوي وسفلي قليل -->
+<div style="text-align: center; margin-bottom: 2px; margin-top: 4px; position: relative;">
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 5px; direction: rtl; font-family: 'Arial', sans-serif;">
+      <h2 style="font-size: 2.4em; font-weight: bold; margin: 0; color: #333; line-height: 1.2;">
+        {%- if doc.payment_type == "Receive" -%}
+          إيصال قبض
+        {%- elif doc.payment_type == "Pay" -%}
+          إيصال دفع
+        {%- elif doc.payment_type == "Internal Transfer" -%}
+          إيصال تحويل داخلي
+        {%- else -%}
+          إيصال مدفوعات
+        {%- endif -%}
+      </h2>
+    </div>
+    
+    <!-- رقم المستند والتاريخ -->
+    <div style="direction: rtl; font-family: 'Arial', sans-serif; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 0.95em; color: #666; white-space: nowrap;">
+        رقم المستند: {{ doc.name }}
+      </span>
+      <span style="font-size: 0.95em; color: #666; white-space: nowrap;">
+        التاريخ / {{ doc.get_formatted("posting_date") }}
+      </span>
+    </div>
+</div>
+
+
+<!-- سطر استلمنا من المكرم والمحترم -->
+<div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 14px; margin-top: 3px; text-align: right;">
+  <span style="font-weight: bold;">استلمنا من المكرم /</span>&nbsp;&nbsp;
+  <span>{{ doc.party }}</span>&nbsp;&nbsp;
+  <span style="font-weight: bold;">المحترم</span>
+</div>
+
+<!-- سطر مبلغا وقدره فقط -->
+<div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 14px; margin-top: 8px; text-align: right;">
+  <span style="font-weight: bold;">مبلغا وقدره فقط :</span>
+  <span style="margin-right: 10px;">{{ doc.custom_tafqeet_amount or "" }}</span>
+</div>
+
+<!-- سطر طريقة الدفع والمراجع -->
+<div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 14px; margin-top: 8px; text-align: right;">
+  <span style="font-weight: bold;">نقدا / بنك / شيك :</span>
+  <span style="margin-right: 10px;">{{ doc.mode_of_payment or "" }}</span>
+  {% if doc.reference_no %}
+  <span style="font-weight: bold; margin-right: 20px;">مرجع رقم :</span>
+  <span style="margin-right: 10px;">{{ doc.reference_no }}</span>
+  <span style="font-weight: bold; margin-right: 20px;">التاريخ :</span>
+  <span>{{ doc.reference_date or "" }}</span>
+  {% endif %}
+</div>
+
+<!-- سطر الملاحظات -->
+<div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 14px; margin-top: 5px; display: flex; align-items: center; width: 100%;">
+  <span style="font-weight: bold; white-space: nowrap; margin-left: 5px;">ملاحظات /</span>
+  <span style="border-bottom: 1px dotted #000; padding: 0 0 2px 0; flex: 1; min-width: 0;">&nbsp;</span>
+</div>
+
+{% if doc.paid_to %}
+  {% set bank_account_doc = frappe.db.get_value("Bank Account", {"account": doc.paid_to}, "bank") %}
+  {% if bank_account_doc %}
+    {% set bank_name = frappe.db.get_value("Bank", bank_account_doc, "bank_name") %}
+    {% if bank_name %}
+<div style="direction: rtl; font-family: 'Arial', sans-serif; font-size: 14px; margin-top: 5px; text-align: right;">
+  <span style="font-weight: bold;">علي بنك</span>
+  <span style="margin-right: 10px;">{{ bank_name }}</span>
+</div>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+<!-- عنوان وجدول المستندات المرتبطة (مضغوط جداً) -->
+<div style="text-align: right; font-size: 1em; font-weight: bold; color: #222; margin: 3px 0 1px 0;">
+    عن المستندات التاليه
+</div>
+<table style="width: 100%; border-collapse: separate; border-spacing: 0; direction: rtl; font-family: 'Arial', sans-serif; font-size: 11px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; margin: 0;">
+    <thead>
+        <tr>
+            <th style="width:5%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #e9ecef; font-weight: bold; font-size: 11px; border-top-right-radius: 4px;">
+                م
+            </th>
+            <th style="width:12%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #e9ecef; font-weight: bold; font-size: 11px;">
+                المستند
+            </th>
+            <th style="width:28%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #e9ecef; font-weight: bold; font-size: 11px;">
+                الرقم
+            </th>
+            <th style="width:15%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #e9ecef; font-weight: bold; font-size: 11px;">
+                المستحق
+            </th>
+            <th style="width:15%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #e9ecef; font-weight: bold; font-size: 11px;">
+                المستلم حاليا
+            </th>
+            <th style="width:15%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #e9ecef; font-weight: bold; font-size: 11px; border-top-left-radius: 4px;">
+                المتبقي
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    {%- for row in doc.references -%}
+        <tr>
+            <td style="width:5%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #fff;">
+                {{ row.idx }}
+            </td>
+            <td style="width:12%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #fff;">
+                {{ row.reference_doctype }}
+            </td>
+            <td style="width:28%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #fff;">
+                {{ row.reference_name }}
+            </td>
+            <td style="width:15%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #fff;">
+                {{ row.total_amount }}
+            </td>
+            <td style="width:15%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #fff;">
+                {{ row.allocated_amount }}
+            </td>
+            <td style="width:15%; border: 1px solid #ccc; padding: 1px 3px; text-align: center; background-color: #fff;">
+                {{ row.outstanding_amount }}
+            </td>
+        </tr>
+    {%- endfor -%}
+    </tbody>
+</table>
+
+<!-- Signatures - Moved to bottom, PDF compatible -->
+<div style="width:100%; margin-top:30px; margin-bottom:10px; overflow:hidden; background:#fff; font-family:'Cairo', Tahoma, Arial, sans-serif; line-height:1; border:none; padding:10px 0; page-break-inside:avoid;">
+  <table style="width:100%; border:none; background:none; border-spacing:0; direction:rtl; line-height:1; margin:0; padding:0;">
+    <tbody>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; width:50%;">
+          المستلم /
+        </td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; width:50%;">
+          التوقيع /
+        </td>
+      </tr>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:30px; padding:5px 5px 0 5px;"></td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:30px; padding:5px 5px 0 5px;"></td>
+      </tr>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0 5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
+          <div style="width:150px; margin:0 auto; border-top:2px dotted #000;"></div>
+        </td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0 5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
+          <div style="width:150px; margin:0 auto; border-top:2px dotted #000;"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Footer from Letter Head -->
+{% if footer %}
+{{ footer | safe }}
+{% endif %}
