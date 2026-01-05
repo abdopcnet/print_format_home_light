@@ -220,42 +220,6 @@
             </td>
           </tr>
 
-          {% set payment_entries = frappe.get_all("Payment Entry Reference", filters={"reference_doctype": "Sales Invoice", "reference_name": doc.name}, fields=["parent", "allocated_amount"]) %}
-          {% set submitted_payments = [] %}
-          {% for ref in payment_entries %}
-            {% set pe_docstatus = frappe.db.get_value("Payment Entry", ref.parent, "docstatus") %}
-            {% if pe_docstatus == 1 %}
-              {% set pe_paid_to = frappe.db.get_value("Payment Entry", ref.parent, "paid_to") %}
-              {% set _ = submitted_payments.append({"name": ref.parent, "paid_to": pe_paid_to, "paid_amount": ref.allocated_amount}) %}
-            {% endif %}
-          {% endfor %}
-          {% if submitted_payments %}
-            {% for entry in submitted_payments %}
-            <tr>
-              <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">
-                المبلغ المحصل
-                <span style="display:inline-block; font-size:0.7em; font-weight:normal; color:#555; margin:0; margin-right:4px; white-space:nowrap;">( إذن إستلام {{ entry.name }} )</span>
-              </th>
-              <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-                {{ frappe.utils.fmt_money(entry.paid_amount, currency=doc.currency) | safe }}
-              </td>
-            </tr>
-            {% endfor %}
-            <tr>
-              <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:1px solid #ddd; border-top:1px solid #bbb; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">إجمالي المبالغ المحصلة</th>
-              <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:1px solid #ddd; border-top:1px solid #bbb; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-                {{ frappe.utils.fmt_money(submitted_payments | map(attribute='paid_amount') | sum, currency=doc.currency) | safe }}
-              </td>
-            </tr>
-          {% endif %}
-
-          <tr>
-            <th style="margin:0; padding:7px 5px; line-height:1; vertical-align:middle; border-bottom:2px solid #000; border-top:none; border-left:none; border-right:none; font-weight:bold; text-align:right; direction:rtl; display:table-cell;">المبلغ المتبقي</th>
-            <td dir="ltr" style="margin:0; padding:7px 5px; line-height:1; border-bottom:2px solid #000; border-top:none; border-left:none; border-right:none; font-weight:bold; direction:ltr; white-space:nowrap; font-variant-numeric:tabular-nums; vertical-align:middle; display:table-cell; text-align:left;">
-              {{ frappe.utils.fmt_money(doc.outstanding_amount, currency=doc.currency) | safe }}
-            </td>
-          </tr>
-
           <tr>
             <td colspan="2" style="margin:0; padding:7px 5px; font-size:14px; line-height:1.4; font-weight:bold; text-align:center; color:#222; border:none; word-wrap:break-word; white-space:normal; overflow-wrap:break-word;">
               {{ doc.custom_tafqeet_amount }}
