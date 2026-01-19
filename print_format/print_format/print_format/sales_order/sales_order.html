@@ -144,13 +144,13 @@
   <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
     <thead>
       <tr style="border-bottom: 2px solid #666;">
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; width: 30px; vertical-align:middle;">م</th>
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 80px; vertical-align:middle;">الكود</th>
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: right; border-left: 1px solid #ccc; vertical-align:middle;">الصنف</th>
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 60px; vertical-align:middle;">الوحدة</th>
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 70px; vertical-align:middle;">الكمية</th>
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 80px; vertical-align:middle;">السعر</th>
-        <th style="background: #eee; padding: 10px 6px; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 100px; vertical-align:middle;">الإجمالي</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; width: 30px; vertical-align:middle;">م</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 70px; vertical-align:middle;">الكود</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: right; border-left: 1px solid #ccc; vertical-align:middle;">الصنف</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 50px; vertical-align:middle;">الوحدة</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 50px; vertical-align:middle;">الكمية</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 50px; vertical-align:middle;">السعر</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 50px; vertical-align:middle;">الإجمالي</th>
       </tr>
     </thead>
     <tbody>
@@ -164,14 +164,14 @@
         {% endif %}
         <tr{% if row_style %} style="{{ row_style|trim }}"{% endif %}>
           <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 30px;">{{ loop.index }}</td>
-          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 80px;">{{ row.item_code }}</td>
-          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: right;">{{ row.description }}</td>
-          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 60px;">{{ row.uom }}</td>
-          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 70px;">{{ "{:,.2f}".format(row.qty or 0) }}</td>
-          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; direction: ltr; width: 80px;">
+          <td style="padding: 7px 5px; font-size: 0.8em; vertical-align: middle; text-align: center; width: 70px;">{{ row.item_code }}</td>
+          <td style="padding: 7px 5px; font-size: 0.8em; vertical-align: middle; text-align: right;">{{ row.description }}</td>
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 50px;">{{ row.uom }}</td>
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 50px;">{{ "{:,.2f}".format(row.qty or 0) }}</td>
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; direction: ltr; width: 50px;">
             {{ "{:,.2f}".format(row.net_rate or 0) }}
           </td>
-          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; direction: ltr; width: 100px;">
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; direction: ltr; width: 50px;">
             {{ "{:,.2f}".format(row.net_amount or 0) }}
           </td>
         </tr>
