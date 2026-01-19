@@ -1,0 +1,191 @@
+<!-- PDF Margins - Meta Tags for wkhtmltopdf -->
+<meta name="margin-top" content="5mm">
+<meta name="margin-bottom" content="5mm">
+<meta name="margin-left" content="5mm">
+<meta name="margin-right" content="5mm">
+
+
+<!-- Letterhead -->
+<div style="height:5px;"></div>
+<div style="width:100%; text-align:center; margin:0 0 5px 0;">
+  <img src="/files/company.png" alt="Letterhead" style="max-width:100%; height:auto; display:block; margin:0 auto;">
+</div>
+
+<!-- Heading -->
+<div style="height:5px;"></div>
+
+<div style="width:100%;max-width:100%;margin:0 0 5px 0;padding:0;background:#fff;font-family:'Cairo',Tahoma,Arial,sans-serif;box-sizing:border-box;box-shadow:0 1px 3px rgba(255,182,49,0.09);direction:rtl;overflow:hidden;">
+  <div style="display:flex;justify-content:center;align-items:center;padding:4px 10px;line-height:1;text-align:center;white-space:nowrap;font-weight:bold;color:#000;font-size:1.4em;letter-spacing:.5px;">
+    إذن تسليم أصناف
+  </div>
+</div>
+
+<!-- Customer Info -->
+<div style="border:1.5pt solid #000; border-radius:8pt; background:#fff; width:100%; margin:0 0 2pt 0; padding:0; font-family:'Cairo',Tahoma,Arial,sans-serif; direction:rtl; box-sizing:border-box;">
+  <table style="width:100%; border-collapse:collapse; margin:0; padding:0; line-height:1.1; font-family:'Cairo',Tahoma,Arial,sans-serif; table-layout:auto;">
+    <tbody>
+      {% set customer_doc = frappe.get_doc("Customer", doc.customer) %}
+
+      <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">اسم العميل</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.customer_name or "" }}</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">رقم الفاتورة</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.name }}</td>
+      </tr>
+      
+      {% set address_name = frappe.db.get_value("Dynamic Link", {"link_doctype": "Customer", "link_name": doc.customer}, "parent") %}
+      {% set address_line2 = "" %}{% set custom_area = "" %}{% set address_line1 = "" %}{% set city = "" %}{% set pincode = "" %}
+      {% if address_name %}
+        {% set address_values = frappe.db.get_value("Address", address_name, ["address_line2","custom_area","address_line1","city","pincode"]) %}
+        {% if address_values %}
+          {% set address_line2 = address_values[0] %}{% set custom_area = address_values[1] %}{% set address_line1 = address_values[2] %}{% set city = address_values[3] %}{% set pincode = address_values[4] %}
+        {% endif %}
+      {% endif %}
+      <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">العنوان</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+          {% set address_parts = [] %}
+          {% if address_line2 %}{% set _ = address_parts.append(address_line2) %}{% endif %}
+          {% if custom_area %}{% set _ = address_parts.append(custom_area) %}{% endif %}
+          {% if address_line1 %}{% set _ = address_parts.append(address_line1) %}{% endif %}
+          {% if city %}{% set _ = address_parts.append(city) %}{% endif %}
+          {{ address_parts | join(', ') }}
+        </td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">تاريخ الفاتورة</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+          {% set days_ar = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد'] %}
+          {% set dt = frappe.utils.get_datetime(doc.posting_date ~ ' ' ~ doc.posting_time) %}
+          {% set weekday = dt.weekday() %}
+          {{ days_ar[weekday] }} {{ "%02d"|format(dt.day) }}-{{ "%02d"|format(dt.month) }}-{{ dt.year }}
+        </td>
+      </tr>
+
+      <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
+        {% if customer_doc.custom_vat_registration_number %}
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">الرقم الضريبي</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ customer_doc.custom_vat_registration_number }}</td>
+        {% else %}
+        <td style="border:none; width:15%; vertical-align:middle;"></td>
+        <td style="border:none; width:35%; vertical-align:middle;"></td>
+        {% endif %}
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">وقت الفاتورة</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">
+          {% set hour = dt.hour %}
+          {% set minute = dt.minute %}
+          {% set hour12 = hour if 1 <= hour <= 12 else (hour - 12 if hour > 12 else 12) %}
+          {% set am_pm_ar = 'ص' if hour < 12 else 'م' %}
+          {{ hour12 }}:{{ "%02d"|format(minute) }} {{ am_pm_ar }}
+        </td>
+      </tr>
+      
+      {% set type_ar = {
+        "Tax Identification Number": ["الرقم الضريبي"],
+        "Commercial Registration Number": ["السجل التجاري"],
+        "MOMRAH License": ["رخصة وزارة الشؤون البلدية والقروية والإسكان"],
+        "MHRSD License": ["رخصة وزارة الموارد البشرية والتنمية الاجتماعية"],
+        "700 Number": ["الرقم الموحد"],
+        "MISA License": ["رخصة وزارة الاستثمار"],
+        "National ID": ["الهوية الوطنية"],
+        "GCC ID": ["هوية مجلس التعاون"],
+        "Iqama": ["رقم الإقامة"],
+        "Passport ID": ["رقم جواز السفر"],
+        "Other OD": ["أخرى"]
+      } %}
+      {% for row in customer_doc.custom_additional_ids %}
+        {% if row.value %}
+        <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
+          <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">{{ type_ar.get(row.type_name, [row.type_name])[0] }}</td>
+          <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ row.value }}</td>
+          {% if loop.index == 2 %}
+            <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">نوع الفاتورة</td>
+            <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.invoice_type or "" }}</td>
+          {% else %}
+            <td style="border:none; width:15%; vertical-align:middle;"></td><td style="border:none; width:35%; vertical-align:middle;"></td>
+          {% endif %}
+        </tr>
+        {% endif %}
+      {% endfor %}
+
+      {% if not customer_doc.custom_additional_ids or customer_doc.custom_additional_ids|length == 0 %}
+      <tr style="font-size:10pt; line-height:1.1; white-space:nowrap;">
+        <td style="border:none; width:15%; vertical-align:middle;"></td><td style="border:none; width:35%; vertical-align:middle;"></td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; font-weight:bold; width:15%; white-space:nowrap; vertical-align:middle;">نوع الفاتورة</td>
+        <td style="border:none; padding:1pt; color:#111; text-align:right; width:35%; white-space:nowrap; vertical-align:middle;">{{ doc.invoice_type or "" }}</td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Items Table -->
+<div style="border: 2px solid #000; border-radius: 8px; overflow: hidden; direction: rtl; font-family: 'Cairo', Tahoma, Arial, sans-serif;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+    <thead>
+      <tr style="border-bottom: 2px solid #666;">
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; width: 30px; vertical-align:middle;">م</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 70px; vertical-align:middle;">الكود</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; vertical-align:middle;">الصنف</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 50px; vertical-align:middle;">الوحدة</th>
+        <th style="background: #eee; padding: 2px 6px !important; font-weight: bold; text-align: center; border-left: 1px solid #ccc; width: 50px; vertical-align:middle;">الكمية</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in doc.items %}
+        {% set row_style = "" %}
+        {% if loop.index % 2 == 0 %}
+          {% set row_style = row_style + "background: #f9f9f9; " %}
+        {% endif %}
+        {% if not loop.last %}
+          {% set row_style = row_style + "border-bottom: 1px dotted #aaa; " %}
+        {% endif %}
+        <tr{% if row_style %} style="{{ row_style|trim }}"{% endif %}>
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 30px;">{{ loop.index }}</td>
+          <td style="padding: 7px 5px; font-size: 0.8em; vertical-align: middle; text-align: center; width: 70px;">{{ row.item_code }}</td>
+          <td style="padding: 7px 5px; font-size: 0.8em; vertical-align: middle; text-align: right;">{{ row.description }}</td>
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 50px;">{{ row.uom }}</td>
+          <td style="padding: 7px 5px; font-size: 0.9em; vertical-align: middle; text-align: center; width: 50px;">{{ "{:,.2f}".format(row.qty or 0) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Signatures - Moved to bottom, PDF compatible -->
+<div style="width:100%; margin-top:30px; margin-bottom:10px; overflow:hidden; background:#fff; font-family:'Cairo', Tahoma, Arial, sans-serif; line-height:1; border:none; padding:10px 0; page-break-inside:avoid;">
+  <table style="width:100%; border:none; background:none; border-spacing:0; direction:rtl; line-height:1; margin:0; padding:0;">
+    <tbody>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; width:33.33%;">
+          البائع
+        </td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; width:33.33%;">
+          أمين المستودع
+        </td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; width:33.33%;">
+          المستلم
+        </td>
+      </tr>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:30px; padding:5px 5px 0 5px;"></td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:30px; padding:5px 5px 0 5px;"></td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:30px; padding:5px 5px 0 5px;"></td>
+      </tr>
+      <tr>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0 5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
+          <div style="width:150px; margin:0 auto; border-top:2px dotted #000;"></div>
+        </td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0 5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
+          <div style="width:150px; margin:0 auto; border-top:2px dotted #000;"></div>
+        </td>
+        <td style="font-family:'Cairo', Arial, sans-serif; font-size:0.92em; padding:0 5px; vertical-align:middle; color:#222; font-weight:700; letter-spacing:0.1px; text-align:center; border:none; height:1px;">
+          <div style="width:150px; margin:0 auto; border-top:2px dotted #000;"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Footer from Letter Head -->
+{% if footer %}
+{{ footer | safe }}
+{% endif %}
